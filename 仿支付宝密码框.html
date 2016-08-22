@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>支付宝输入框</title>
+  <style>
+	.pay-container{  position: relative; width: 180px; height: 14px; padding: 8px 0; margin: 0 auto; border: 1px solid #CCC; border-radius: 2px; cursor: text; }
+	.pay-container i{ display: block; float: left; width: 29px; padding: 5px 0;  border-left: 1px solid #CCC; }
+	.pay-container i:first-child{ border-left: none; }
+	.pay-container span{ position: absolute; top: -1px; left: -1px; visibility: hidden; width: 29px; padding: 3px 0; text-align: center; border: 1px solid rgba(82,168,236,.8); box-shadow: inset 0 1px 1px rgba(82,168,236,.075), 0 0 8px rgba(82,168,236,.6); -webkit-box-shadow: inset 0 1px 1px rgba(82,168,236,.075), 0 0 8px rgba(82,168,236,.6); border-radius: 2px; transition: left .5s ease 0s; -webkit-transition: left .5s ease 0s;  }
+	.pay-container .flash{ display: none; font-weight: 100; animation: flash .8s steps(2,start) infinite; -webkit-animation: flash .8s steps(2,start) infinite;  }
+	.pwd{ display: block; width: 7px; height: 7px; margin: 0 auto; border-radius: 50%; background: #000; visibility: hidden;  }
+	input{position: absolute; left: -9999px;}
+	@keyframes flash{
+		0%{ visibility: visible; }
+		100%{ visibility: hidden; }
+	}
+	@-webkit-keyframes flash{
+		0%{ visibility: visible; }
+		100%{ visibility: hidden; }
+	}d
+  </style>
+ </head>
+ <body>
+	<div class="pay-container">
+		<i><b class="pwd"></b></i>
+		<i><b class="pwd"></b></i>
+		<i><b class="pwd"></b></i>
+		<i><b class="pwd"></b></i>
+		<i><b class="pwd"></b></i>
+		<i><b class="pwd"></b></i>
+		<span><b class="flash">|</b></span>
+		<input type='password' name="passwd" >
+	</div>
+	<script>
+		(function(){
+			var pay_c = document.querySelector(".pay-container"),
+				active = 0,
+				count = document.getElementsByTagName("i"),
+				i_length = count.length,
+				flash = document.querySelector(".flash"),
+				span_bg = pay_c.getElementsByTagName("span")[0],
+				input_pwd = document.getElementsByTagName("input")[0],
+				left = [];
+			left.push(0);
+			for(var i = 1;i<i_length;i++){
+				left.push((count[i].clientWidth + .8) * i);
+			}
+			console.log(left);
+			var E = {
+				on: function(el,type,fn){
+					el.addEventListener ? el.addEventListener(type,fn,false) : el.attachEvent 
+										? el.attachEvent("on" + type,fn) : el["on" + type] = fn;
+				},
+				un: function(el,type,fn){
+					el.removeEventListener ? el.removeEventListener(type,fn,false): el.detachEvent
+										   ? el.detachEvent("on" + type, fn): el["on" + type] = null;
+				
+				},
+				event: function(e){
+					return e || window.event;
+				}
+			};
+			E.on(pay_c,"click", function(e){
+				e = E.event(e);
+				count[active].children[0].style.visibility = "hidden";
+				input_pwd.focus();
+			});
+			E.on(input_pwd,"focus",function(e){
+				e = E.event(e);
+				span_bg.style.visibility = "visible";
+				flash.style.display = "block";
+			});
+			E.on(input_pwd,"blur",function(e){
+				e = E.event(e);
+				span_bg.style.visibility = "hidden";
+				flash.style.display = "none";
+			});
+			E.on(input_pwd,"keyup",function(e){
+				e = E.event(e);
+				if(/[^\d]/.test(this.value)){
+					this.value = this.value.replace(/[^\d.]/g,"");
+				}else{
+					
+					if(e.keyCode === 8){
+						if(active === 0) return;
+						active--;
+						span_bg.style.left = left[active] + "px";
+						count[active].children[0].style.visibility = "hidden";
+					}else{
+						if(active>= i_length - 1){
+							span_bg.style.visibility = "hidden";
+							flash.style.display = "none";
+							count[active].children[0].style.visibility = "visible";
+							input_pwd.blur();
+						}else{
+							count[active].children[0].style.visibility = "visible";
+							active++;
+							span_bg.style.left = left[active] + "px";
+							
+						}
+						
+					}
+					
+					
+				}
+			});
+		})();
+	</script>
+ </body>
+</html>
